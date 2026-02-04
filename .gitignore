@@ -1,0 +1,36 @@
+# MacOS system files
+*.DS_Store
+
+# Public
+public/*
+
+# Build output directories
+bin/
+build/
+dist/
+output/
+out/
+
+# IDE/editor config
+.vscode/
+.idea/
+.fleet/
+*.swp
+*~
+.env
+
+# Logs and temporary files
+*.log
+*.tmp
+
+# .vscode/*
+# !.vscode/settings.json
+# !.vscode/tasks.json
+# !.vscode/launch.json
+# !.vscode/extensions.json
+
+# Configuration files
+*.config
+
+# Temporary test outputs
+test/
