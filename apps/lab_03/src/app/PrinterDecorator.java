@@ -1,3 +1,5 @@
+package app;
+
 public abstract class PrinterDecorator implements StudPrinter {
     protected StudPrinter printer;
 

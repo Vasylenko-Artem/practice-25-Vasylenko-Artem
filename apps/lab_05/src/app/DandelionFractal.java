@@ -6,7 +6,7 @@ import java.awt.geom.Point2D;
 
 public class DandelionFractal extends JPanel {
 
-    private int order; // Порядок фракталу
+    private int order; // Order of the fractal
     private Point2D.Double P1, P2;
 
     public DandelionFractal(Point2D.Double P1, Point2D.Double P2, int order) {
@@ -29,14 +29,14 @@ public class DandelionFractal extends JPanel {
         } else {
             g.drawLine((int)start.x, (int)start.y, (int)end.x, (int)end.y);
 
-            // Вектор від start до end
+            // Vector from start to end
             double dx = end.x - start.x;
             double dy = end.y - start.y;
 
-            // Довжина гілки менша (наприклад, 70% від поточної)
+            // The length of the branch is less (for example, 70% of the current one)
             double scale = 0.7;
 
-            // Створюємо нові кінці відгалужень під кутами ±45 градусів
+            // We create new branch ends at angles of 45 degrees
             double angle1 = Math.toRadians(45);
             double angle2 = Math.toRadians(-45);
 
@@ -59,7 +59,7 @@ public class DandelionFractal extends JPanel {
         JFrame frame = new JFrame("Dandelion Fractal");
         Point2D.Double P1 = new Point2D.Double(300, 350);
         Point2D.Double P2 = new Point2D.Double(300, 250);
-        int order = 5; // Порядок фракталу
+        int order = 5; // Order of the fractal
 
         DandelionFractal panel = new DandelionFractal(P1, P2, order);
         frame.add(panel);

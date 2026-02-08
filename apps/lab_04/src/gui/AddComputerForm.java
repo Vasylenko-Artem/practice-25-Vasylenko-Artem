@@ -8,7 +8,7 @@ import java.sql.SQLException;
 
 public class AddComputerForm extends JDialog {
 
-    public AddComputerForm(JFrame parent, ComputerDAO dao) {
+    public AddComputerForm(JFrame parent, ComputerDAO dao, Runnable onSuccess) {
         super(parent, "Add Computer", true);
         setLayout(new GridLayout(8, 2));
 
@@ -40,7 +40,7 @@ public class AddComputerForm extends JDialog {
                         video.getText(),
                         sound.getText()
                 );
-                parent.repaint();
+                if (onSuccess != null) onSuccess.run(); // updating the list in MainForm
                 dispose();
             } catch (SQLException ex) {
                 JOptionPane.showMessageDialog(this, "Error: " + ex.getMessage());

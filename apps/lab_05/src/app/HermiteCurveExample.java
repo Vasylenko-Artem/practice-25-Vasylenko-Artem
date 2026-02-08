@@ -6,11 +6,11 @@ import java.awt.geom.Point2D;
 
 public class HermiteCurveExample extends JPanel {
 
-    // Точки P1 і P2
+    // Points P1 and P2
     private Point2D.Double P1 = new Point2D.Double(100, 300);
     private Point2D.Double P2 = new Point2D.Double(400, 100);
 
-    // Вектори V1 і V2
+    // Vectors V1 and V2
     private Point2D.Double V1 = new Point2D.Double(150, -200);
     private Point2D.Double V2 = new Point2D.Double(150, 200);
 
@@ -19,7 +19,7 @@ public class HermiteCurveExample extends JPanel {
         super.paintComponent(g);
         Graphics2D g2d = (Graphics2D) g;
 
-        // Малюємо криву Ерміта
+        // We draw the Hermite curve
         g2d.setColor(Color.BLUE);
         Point2D.Double prev = P1;
         for (double t = 0; t <= 1; t += 0.01) {
@@ -36,7 +36,7 @@ public class HermiteCurveExample extends JPanel {
             prev = curr;
         }
 
-        // Малюємо контрольні точки та вектори
+        // We draw control points and vectors
         g2d.setColor(Color.RED);
         g2d.fillOval((int)P1.x-5, (int)P1.y-5, 10, 10);
         g2d.fillOval((int)P2.x-5, (int)P2.y-5, 10, 10);

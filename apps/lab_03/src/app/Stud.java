@@ -1,3 +1,5 @@
+package app;
+
 public class Stud implements Prototype {
     private int id;
     private int stipend;
@@ -10,7 +12,7 @@ public class Stud implements Prototype {
     public void setStipend(int stipend) {
         this.stipend = stipend;
     }
-
+    
     public void print() {
         System.out.println("Stud id=" + id + " stipend=" + stipend);
     }

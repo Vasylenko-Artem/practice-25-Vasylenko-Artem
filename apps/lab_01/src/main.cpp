@@ -2,11 +2,13 @@
 #include <cmath>
 #include <fstream>
 #include <vector>
-#include <stdexcept>
+#include <string>
+
+#include "error.h"
 
 using namespace std;
 
-//  ALGORITHM 3
+// ALGORITHM 3
 double fun3(double x, double y, double z)
 {
 	return 1.3498 * z + 2.2362 * y - 2.348 * x * y;
@@ -26,18 +28,15 @@ void loadTU(double x, double &Tout, double &Uout)
 
 	ifstream file(filename);
 	if (!file.is_open())
-		throw runtime_error("File not found");
+		throw ErrorNoFile(filename);
 
 	vector<double> X, T, U;
 	double a, b, c;
-
 	while (file >> a >> b >> c)
 	{
 		X.push_back(a);
 		T.push_back(b);
 		U.push_back(c);
-
-		cout << a << " " << b << " " << c << endl;
 	}
 
 	int n = X.size();
@@ -59,10 +58,10 @@ void loadTU(double x, double &Tout, double &Uout)
 			return;
 		}
 
-	throw runtime_error("X outside table");
+	throw ErrorRange("X outside table");
 }
 
-// T / U
+// T / U wrappers
 double Trz(double x, double X, double Y, double Z)
 {
 	try
@@ -122,15 +121,15 @@ double Glr1(double x, double y)
 double Grs1(double x, double y, double X, double Y, double Z)
 {
 	return 0.14 * Srz(x + y, Gold1(x, y), Glr1(x, x * y), X, Y, Z) +
-		   1.83 * Srz(x - y, Gold1(y, x / 5), Glr1(4 * x, x * y), X, Y, Z) +
-		   0.83 * Srz(x, Glr1(y, x / 4), Gold1(4 * y, y), X, Y, Z);
+	       1.83 * Srz(x - y, Gold1(y, x / 5), Glr1(4 * x, x * y), X, Y, Z) +
+	       0.83 * Srz(x, Glr1(y, x / 4), Gold1(4 * y, y), X, Y, Z);
 }
 
 double fun2(double x, double y, double z)
 {
 	return x * Grs1(x, y, x, y, z) +
-		   y * Grs1(y, z, x, y, z) +
-		   z * Grs1(z, x, x, y, z);
+	       y * Grs1(y, z, x, y, z) +
+	       z * Grs1(z, x, x, y, z);
 }
 
 // ALGORITHM 1
@@ -140,7 +139,7 @@ double Gold(double x, double y)
 		return x / y;
 	if (x < y && x != 0)
 		return y / x;
-	throw runtime_error("Gold error");
+	throw ErrorRange("Division not possible in Gold");
 }
 
 double Glr(double x, double y)
@@ -150,48 +149,61 @@ double Glr(double x, double y)
 	if (fabs(x) >= 1 && fabs(y) < 1)
 		return y;
 
-	double v = x * x + y * y - 4;
-	if (v <= 0)
-		throw runtime_error("Glr sqrt error");
+	double val = x * x + y * y - 4;
+	if (val <= 0)
+		throw ErrorRange("sqrt negative in Glr");
 
-	double r = sqrt(v);
-
+	double r = sqrt(val);
 	if (fabs(x) >= 1 && fabs(y) >= 1 && r > 0.1)
 		return y / r;
 
-	throw runtime_error("Glr threshold error");
+	throw ErrorRange("Glr threshold not satisfied");
 }
 
 double Grs(double x, double y, double X, double Y, double Z)
 {
 	return 0.1389 * Srz(x + y, Gold(x, y), Glr(x, x * y), X, Y, Z) +
-		   1.8389 * Srz(x - y, Gold(y, x / 5), Glr(5 * x, x * y), X, Y, Z) +
-		   0.83 * Srz(x - 0.9, Glr(y, x / 5), Gold(5 * y, y), X, Y, Z);
+	       1.8389 * Srz(x - y, Gold(y, x / 5), Glr(5 * x, x * y), X, Y, Z) +
+	       0.83 * Srz(x - 0.9, Glr(y, x / 5), Gold(5 * y, y), X, Y, Z);
 }
 
+double fun1(double x, double y, double z)
+{
+	double A = Grs(y, z, x, y, z);
+	double B = Grs(x, z, x, y, z);
+	double C = Grs(x, z, x, y, z);
+
+	return x * x * A + y * y * B + 0.33 * x * y * C;
+}
+
+// MASTER FUN
 double fun(double x, double y, double z)
 {
 	try
 	{
-		double A = Grs(y, z, x, y, z);
-		double B = Grs(x, z, x, y, z);
-		double C = Grs(x, z, x, y, z);
-
-		return x * x * A + y * y * B + 0.33 * x * y * C;
+		return fun1(x, y, z); // Algorithm1
+	}
+	catch (ErrorRange &)
+	{
+		return fun2(x, y, z); // Algorithm2
+	}
+	catch (ErrorNoFile &)
+	{
+		return fun3(x, y, z); // Algorithm3
 	}
 	catch (...)
 	{
-		// if Algorithm1 failed, run Algorithm2
-		return fun2(x, y, z);
+		return fun3(x, y, z); // fallback
 	}
 }
 
 int main()
 {
 	double x, y, z;
-
 	cout << "Enter x y z: ";
 	cin >> x >> y >> z;
 
-	cout << "fun = " << fun(x, y, z) << endl;
+	double f = fun(x, y, z);
+
+	cout << "fun = " << f << endl;
 }

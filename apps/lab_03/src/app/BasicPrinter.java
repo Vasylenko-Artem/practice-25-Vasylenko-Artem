@@ -1,3 +1,5 @@
+package app;
+
 public class BasicPrinter implements StudPrinter {
 
     private Stud stud;

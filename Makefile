@@ -3,7 +3,6 @@ BUILD_DIR := $(abspath out)
 
 subdirs :=
 
-# Подключаем только apps/Makefile для subdir-y
 ifneq ("$(wildcard $(APP_DIR)/Makefile)","")
   include $(APP_DIR)/Makefile
   subdirs := $(addprefix $(APP_DIR)/, $(subdir-y))
@@ -45,5 +44,5 @@ ifndef APP
 endif
 	$(MAKE) -C $(APP_DIR)/$(APP) BUILD_DIR=$(BUILD_DIR)/$(APP) run
 
-run:
+run: build
 	$(BUILD_DIR)/menu/main

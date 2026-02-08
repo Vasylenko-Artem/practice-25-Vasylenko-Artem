@@ -17,7 +17,6 @@ int main()
 	while (true)
 	{
 		clear();
-		mvprintw(0, 0, "Select a lab to run (arrows + Enter):");
 		for (int i = 0; i < n; i++)
 		{
 			if (i == choice)
@@ -30,29 +29,33 @@ int main()
 		int c = getch();
 		switch (c)
 		{
+		case 'q':
+			endwin();
+			return 0;
 		case KEY_UP:
 			choice = (choice - 1 + n) % n;
 			break;
 		case KEY_DOWN:
 			choice = (choice + 1) % n;
 			break;
-		case 10:				 // Enter
+		case 10: // Enter
+		case ' ':
 			if (choice == n - 1) // Exit
 			{
 				endwin();
 				return 0;
 			}
 
-			endwin(); // закрываем ncurses перед запуском
+			endwin(); // close ncurses before starting
 
-			// запускаем выбранную лабораторку через Makefile
+			// launch the selected laboratory via Makefile
 			std::string cmd = "make run_app APP=" + std::string(labs[choice]);
 			system(cmd.c_str());
 
 			std::cout << "Press any key to continue..." << std::endl;
-			getchar();
+			getch();
 
-			initscr(); // возвращаемся в ncurses
+			initscr(); // back to ncurses
 			break;
 		}
 	}

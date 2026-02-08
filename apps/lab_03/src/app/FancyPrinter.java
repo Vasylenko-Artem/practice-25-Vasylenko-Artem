@@ -1,3 +1,5 @@
+package app;
+
 public class FancyPrinter extends PrinterDecorator {
 
     public FancyPrinter(StudPrinter printer) {
