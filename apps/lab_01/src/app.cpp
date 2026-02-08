@@ -24,9 +24,9 @@ void loadTU(double x, double &Tout, double &Uout)
 	if (fabs(x) <= 1)
 		filename = "data/dat_X_1_1.dat";
 	else if (x < -1)
-		filename = "data/dat_X_00_1.dat";
+		filename = "data/dat_X00_1.dat";
 	else
-		filename = "data/dat_X_1_00.dat";
+		filename = "data/dat_X1_00.dat";
 
 	ifstream file(filename);
 	if (!file.is_open())
@@ -40,6 +40,8 @@ void loadTU(double x, double &Tout, double &Uout)
 		X.push_back(a);
 		T.push_back(b);
 		U.push_back(c);
+
+		cout << a << " " << b << " " << c << endl;
 	}
 
 	int n = X.size();
