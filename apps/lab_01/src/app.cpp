@@ -6,17 +6,13 @@
 
 using namespace std;
 
-//
-// ================= ALGORITHM 3 =================
-//
+//  ALGORITHM 3
 double fun3(double x, double y, double z)
 {
 	return 1.3498 * z + 2.2362 * y - 2.348 * x * y;
 }
 
-//
-// ================= LOAD TU =================
-//
+// LOAD TU
 void loadTU(double x, double &Tout, double &Uout)
 {
 	string filename;
@@ -66,9 +62,7 @@ void loadTU(double x, double &Tout, double &Uout)
 	throw runtime_error("X outside table");
 }
 
-//
-// ================= T / U =================
-//
+// T / U
 double Trz(double x, double X, double Y, double Z)
 {
 	try
@@ -97,9 +91,7 @@ double Urz(double x, double X, double Y, double Z)
 	}
 }
 
-//
-// ================= SRZ =================
-//
+// SRZ
 double Srz(double x, double y, double z, double X, double Y, double Z)
 {
 	if (x > y)
@@ -108,11 +100,7 @@ double Srz(double x, double y, double z, double X, double Y, double Z)
 		return Trz(y, X, Y, Z) + Urz(y, X, Y, Z) - Urz(z, X, Y, Z);
 }
 
-//
-// =====================================================
-// ================= ALGORITHM 2 =======================
-// =====================================================
-//
+// ALGORITHM 2
 double Gold1(double x, double y)
 {
 	if (x > y && fabs(y) > 0.1)
@@ -145,11 +133,7 @@ double fun2(double x, double y, double z)
 		   z * Grs1(z, x, x, y, z);
 }
 
-//
-// =====================================================
-// ================= ALGORITHM 1 =======================
-// =====================================================
-//
+// ALGORITHM 1
 double Gold(double x, double y)
 {
 	if (x > y && y != 0)
@@ -197,14 +181,11 @@ double fun(double x, double y, double z)
 	}
 	catch (...)
 	{
-		// если Algorithm1 не смог — запускаем Algorithm2
+		// if Algorithm1 failed, run Algorithm2
 		return fun2(x, y, z);
 	}
 }
 
-//
-// ================= MAIN =================
-//
 int main()
 {
 	double x, y, z;
