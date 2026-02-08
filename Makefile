@@ -1,33 +1,49 @@
-CPP := g++
-CPPFLAGS := -std=c++20 -g -Wall -Wextra -Wpedantic -Wshadow -Wunused-variable -Wuninitialized -Wconversion -Wdeprecated-declarations -Wformat -Wswitch -Wvla -Wunreachable-code -fsanitize=address
-INCLUDES := -Iinclude -Isrc
+APP_DIR := apps
+BUILD_DIR := $(abspath out)
 
-LDFLAGS := -lncurses 
+subdirs :=
 
-BUILD_DIR := build
+# Подключаем только apps/Makefile для subdir-y
+ifneq ("$(wildcard $(APP_DIR)/Makefile)","")
+  include $(APP_DIR)/Makefile
+  subdirs := $(addprefix $(APP_DIR)/, $(subdir-y))
+endif
 
-SRC_DIR := src
-TARGET := $(BUILD_DIR)/main
+.PHONY: all clean
 
-SRCS := $(shell find $(SRC_DIR) -name "*.cpp")
-OBJS := $(SRCS:%.cpp=$(BUILD_DIR)/%.o)
+all: build
 
-.PHONY: all build run clean init
+build: $(BUILD_DIR)
+	@echo "Starting build..."
+	@for dir in $(subdirs); do \
+		if [ -f $$dir/Makefile ]; then \
+			echo "Building $$dir..."; \
+			$(MAKE) -C $$dir BUILD_DIR=$(BUILD_DIR)/$$(basename $$dir); \
+		else \
+			echo "No Makefile in $$dir, skipping"; \
+		fi; \
+	done
+	@echo "All apps built in $(BUILD_DIR)/"
 
-all: build run
-
-build: $(TARGET)
-
-$(TARGET): $(OBJS)
-	@mkdir -p $(BUILD_DIR)
-	$(CPP) $(CPPFLAGS) $(INCLUDES) $(OBJS) $(LDFLAGS) -o $(TARGET)
-
-$(BUILD_DIR)/%.o: %.cpp
-	@mkdir -p $(dir $@)
-	$(CPP) $(CPPFLAGS) $(INCLUDES) -c $< -o $@
-
-run: build
-	@$(TARGET)
+$(BUILD_DIR):
+	mkdir -p $(BUILD_DIR)
 
 clean:
-	@rm -rf $(BUILD_DIR)
+	@echo "Cleaning all apps..."
+	@for dir in $(subdirs); do \
+		if [ -f $$dir/Makefile ]; then \
+			$(MAKE) -C $$dir clean BUILD_DIR=$(BUILD_DIR)/$$(basename $$dir); \
+		fi; \
+	done
+	rm -rf $(BUILD_DIR)
+	@echo "Cleaned all builds"
+
+
+run_app:
+ifndef APP
+	$(error You must specify APP, e.g., make run_app APP=menu)
+endif
+	$(MAKE) -C $(APP_DIR)/$(APP) BUILD_DIR=$(BUILD_DIR)/$(APP) run
+
+run:
+	$(BUILD_DIR)/menu/main
