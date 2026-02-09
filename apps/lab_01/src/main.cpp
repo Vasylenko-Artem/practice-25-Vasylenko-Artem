@@ -176,7 +176,6 @@ double fun1(double x, double y, double z)
 	return x * x * A + y * y * B + 0.33 * x * y * C;
 }
 
-// MASTER FUN
 double fun(double x, double y, double z)
 {
 	try
