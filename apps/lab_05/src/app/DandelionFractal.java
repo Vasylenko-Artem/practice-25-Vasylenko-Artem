@@ -33,12 +33,12 @@ public class DandelionFractal extends JPanel {
             double dx = end.x - start.x;
             double dy = end.y - start.y;
 
-            // The length of the branch is less (for example, 70% of the current one)
-            double scale = 0.7;
+            // The length of the branch is less (for example, 90% of the current one)
+            double scale = 0.9;
 
-            // We create new branch ends at angles of 45 degrees
-            double angle1 = Math.toRadians(45);
-            double angle2 = Math.toRadians(-45);
+            // We create new branch ends at angles of 15 and -15 degrees
+            double angle1 = Math.toRadians(15);
+            double angle2 = Math.toRadians(-15);
 
             Point2D.Double newEnd1 = new Point2D.Double(
                     end.x + (dx * Math.cos(angle1) - dy * Math.sin(angle1)) * scale,
@@ -57,9 +57,9 @@ public class DandelionFractal extends JPanel {
 
     public static void main(String[] args) {
         JFrame frame = new JFrame("Dandelion Fractal");
-        Point2D.Double P1 = new Point2D.Double(300, 350);
-        Point2D.Double P2 = new Point2D.Double(300, 250);
-        int order = 5; // Order of the fractal
+        Point2D.Double P1 = new Point2D.Double(300, 400);
+        Point2D.Double P2 = new Point2D.Double(300, 350);
+        int order = 10; // Order of the fractal
 
         DandelionFractal panel = new DandelionFractal(P1, P2, order);
         frame.add(panel);

@@ -20,11 +20,19 @@ void loadTU(double x, double &Tout, double &Uout)
 	string filename;
 
 	if (fabs(x) <= 1)
+	{
 		filename = "data/dat_X_1_1.dat";
+	}
 	else if (x < -1)
+	{
+		x = 1 / x;
 		filename = "data/dat_X00_1.dat";
+	}
 	else
+	{
+		x = 1 / x;
 		filename = "data/dat_X1_00.dat";
+	}
 
 	ifstream file(filename);
 	if (!file.is_open())
@@ -53,8 +61,8 @@ void loadTU(double x, double &Tout, double &Uout)
 		if (X[i] <= x && x <= X[i + 1])
 		{
 			double k = (x - X[i]) / (X[i + 1] - X[i]);
-			Tout = T[i] + (T[i + 1] - T[i]) * k;
-			Uout = U[i] + (U[i + 1] - U[i]) * k;
+			Tout = T[i] + (T[i + 1] - T[i + 1]) * k;
+			Uout = U[i] + (U[i + 1] - U[i + 1]) * k;
 			return;
 		}
 
@@ -62,7 +70,7 @@ void loadTU(double x, double &Tout, double &Uout)
 }
 
 // T / U wrappers
-double Trz(double x, double X, double Y, double Z)
+double Trz(double x)
 {
 	try
 	{
@@ -72,11 +80,11 @@ double Trz(double x, double X, double Y, double Z)
 	}
 	catch (...)
 	{
-		return fun3(X, Y, Z);
+		return fun3(x, 0, 0);
 	}
 }
 
-double Urz(double x, double X, double Y, double Z)
+double Urz(double x)
 {
 	try
 	{
@@ -86,17 +94,17 @@ double Urz(double x, double X, double Y, double Z)
 	}
 	catch (...)
 	{
-		return fun3(X, Y, Z);
+		return fun3(x, 0, 0);
 	}
 }
 
 // SRZ
-double Srz(double x, double y, double z, double X, double Y, double Z)
+double Srz(double x, double y, double z)
 {
 	if (x > y)
-		return Trz(x, X, Y, Z) + Urz(z, X, Y, Z) - Trz(y, X, Y, Z);
+		return Trz(x) + Urz(z) - Trz(y);
 	else
-		return Trz(y, X, Y, Z) + Urz(y, X, Y, Z) - Urz(z, X, Y, Z);
+		return Trz(y) + Urz(y) - Urz(z);
 }
 
 // ALGORITHM 2
@@ -118,18 +126,18 @@ double Glr1(double x, double y)
 	return (fabs(x) < 1) ? x : y;
 }
 
-double Grs1(double x, double y, double X, double Y, double Z)
+double Grs1(double x, double y)
 {
-	return 0.14 * Srz(x + y, Gold1(x, y), Glr1(x, x * y), X, Y, Z) +
-	       1.83 * Srz(x - y, Gold1(y, x / 5), Glr1(4 * x, x * y), X, Y, Z) +
-	       0.83 * Srz(x, Glr1(y, x / 4), Gold1(4 * y, y), X, Y, Z);
+	return 0.14 * Srz(x + y, Gold1(x, y), Glr1(x, x * y)) +
+	       1.83 * Srz(x - y, Gold1(y, x / 5), Glr1(4 * x, x * y)) +
+	       0.83 * Srz(x, Glr1(y, x / 4), Gold1(4 * y, y));
 }
 
 double fun2(double x, double y, double z)
 {
-	return x * Grs1(x, y, x, y, z) +
-	       y * Grs1(y, z, x, y, z) +
-	       z * Grs1(z, x, x, y, z);
+	return x * Grs1(x, y) +
+	       y * Grs1(y, z) +
+	       z * Grs1(z, x);
 }
 
 // ALGORITHM 1
@@ -139,7 +147,8 @@ double Gold(double x, double y)
 		return x / y;
 	if (x < y && x != 0)
 		return y / x;
-	throw ErrorRange("Division not possible in Gold");
+	if ((x > y && y == 0) || (x < y && x == 0))
+		throw ErrorRange("Division not possible in Gold"); // Algorithm2
 }
 
 double Glr(double x, double y)
@@ -151,7 +160,7 @@ double Glr(double x, double y)
 
 	double val = x * x + y * y - 4;
 	if (val <= 0)
-		throw ErrorRange("sqrt negative in Glr");
+		throw ErrorRange("sqrt negative in Glr"); // Algorithm2
 
 	double r = sqrt(val);
 	if (fabs(x) >= 1 && fabs(y) >= 1 && r > 0.1)
@@ -160,20 +169,16 @@ double Glr(double x, double y)
 	throw ErrorRange("Glr threshold not satisfied");
 }
 
-double Grs(double x, double y, double X, double Y, double Z)
+double Grs(double x, double y)
 {
-	return 0.1389 * Srz(x + y, Gold(x, y), Glr(x, x * y), X, Y, Z) +
-	       1.8389 * Srz(x - y, Gold(y, x / 5), Glr(5 * x, x * y), X, Y, Z) +
-	       0.83 * Srz(x - 0.9, Glr(y, x / 5), Gold(5 * y, y), X, Y, Z);
+	return 0.1389 * Srz(x + y, Gold(x, y), Glr(x, x * y)) +
+	       1.8389 * Srz(x - y, Gold(y, x / 5), Glr(5 * x, x * y)) +
+	       0.83 * Srz(x - 0.9, Glr(y, x / 5), Gold(5 * y, y));
 }
 
 double fun1(double x, double y, double z)
 {
-	double A = Grs(y, z, x, y, z);
-	double B = Grs(x, z, x, y, z);
-	double C = Grs(x, z, x, y, z);
-
-	return x * x * A + y * y * B + 0.33 * x * y * C;
+	return x * x * Grs(y, z) + y * y * Grs(x, z) + 0.33 * x * y * Grs(x, z);
 }
 
 double fun(double x, double y, double z)

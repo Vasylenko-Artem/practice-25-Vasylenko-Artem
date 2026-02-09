@@ -8,7 +8,7 @@ ifneq ("$(wildcard $(APP_DIR)/Makefile)","")
   subdirs := $(addprefix $(APP_DIR)/, $(subdir-y))
 endif
 
-.PHONY: all clean
+.PHONY: all clean run run_app
 
 all: build
 
